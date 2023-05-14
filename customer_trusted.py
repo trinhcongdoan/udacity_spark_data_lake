@@ -44,15 +44,17 @@ Filter_node1684032798625 = Filter.apply(
 )
 
 # Script generated for node S3 bucket
-S3bucket_node3 = glueContext.write_dynamic_frame.from_options(
-    frame=Filter_node1684032798625,
+S3bucket_node3 = glueContext.getSink(
+    path="s3://udacity-project-spark-and-data-lake/data/customer_trusted/",
     connection_type="s3",
-    format="glueparquet",
-    connection_options={
-        "path": "s3://udacity-project-spark-and-data-lake/data/customer_trusted/",
-        "partitionKeys": [],
-    },
+    updateBehavior="UPDATE_IN_DATABASE",
+    partitionKeys=[],
+    enableUpdateCatalog=True,
     transformation_ctx="S3bucket_node3",
 )
-
+S3bucket_node3.setCatalogInfo(
+    catalogDatabase="humanba", catalogTableName="customer_trusted"
+)
+S3bucket_node3.setFormat("json")
+S3bucket_node3.writeFrame(Filter_node1684032798625)
 job.commit()
